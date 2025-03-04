@@ -9,4 +9,5 @@
 #  updated_at  :datetime         not null
 #
 class Thing < ApplicationRecord
+  has_neighbors :embedding
 end

@@ -4,6 +4,19 @@
       Thing #<%= @the_thing.id %> details
     </h1>
 
+    <h2>Most similar:</h2>
+    <ul>
+      <% @the_thing.nearest_neighbors(:embedding, distance: "cosine").first(5).each do |item| %>
+        <% if item.neighbor_distance < 0.65 %>
+          <li>
+            <%= item.description %>
+
+            (<%= item.neighbor_distance %>)
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+
     <div>
       <div>
         <a href="/things">
@@ -44,7 +57,6 @@
 </div>
 
 <hr>
-
 
 <div>
   <div>
