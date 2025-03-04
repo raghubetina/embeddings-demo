@@ -21,6 +21,22 @@ class ThingsController < ApplicationController
     the_thing = Thing.new
     the_thing.description = params.fetch("query_description")
 
+    client = OpenAI::Client.new(
+      access_token: ENV.fetch("OPENAI_TOKEN"),
+    )
+
+    response = client.embeddings(
+      parameters: {
+        model: "text-embedding-3-small",
+        input: the_thing.description,
+      },
+    )
+
+    embedding = response.dig("data", 0, "embedding")
+    # => Vector representation of your embedding
+
+    the_thing.embedding = embedding
+
     if the_thing.valid?
       the_thing.save
       redirect_to("/things", { :notice => "Thing created successfully." })
@@ -37,7 +53,7 @@ class ThingsController < ApplicationController
 
     if the_thing.valid?
       the_thing.save
-      redirect_to("/things/#{the_thing.id}", { :notice => "Thing updated successfully."} )
+      redirect_to("/things/#{the_thing.id}", { :notice => "Thing updated successfully." })
     else
       redirect_to("/things/#{the_thing.id}", { :alert => the_thing.errors.full_messages.to_sentence })
     end
@@ -49,6 +65,6 @@ class ThingsController < ApplicationController
 
     the_thing.destroy
 
-    redirect_to("/things", { :notice => "Thing deleted successfully."} )
+    redirect_to("/things", { :notice => "Thing deleted successfully." })
   end
 end
